@@ -123,7 +123,8 @@ public final class SimJobManager {
                     job.getSpeciesNodeList(), !PathTable.PP_ONLY);
             Log.consoleln("consumeMap " + consumeMap.toString());
             Log.consoleln("pathTable " + pathTable.toString());
-            job.setCsv("Manipulation_id: " + manipId + "\n\n"
+            job.setCsv("Manipulation_id: " + manipId + "\n"
+                    + "\"node_config: " + job.getNode_Config() + "\"\n"
                     + simEngine.getBiomassCSVString(manipId) + "\n\n" 
                     + consumeMap.toString() + "\n\n"
                     + pathTable.toString());
