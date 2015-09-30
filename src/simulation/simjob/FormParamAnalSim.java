@@ -747,7 +747,10 @@ public class FormParamAnalSim extends javax.swing.JFrame {
         int jobId = SimJob.NO_ID;
         //get original job history
         SimJob oldJob = SimJobDAO.loadCompletedJob(Integer.parseInt(jobStr));
-        EcosystemTimesteps ecosysTimesteps = ExtractCSVData.extractCSVData(oldJob.getCsv());
+        EcosystemTimesteps ecosysTimesteps = null;
+        if (oldJob != null) {
+            ecosysTimesteps = ExtractCSVData.extractCSVData(oldJob.getCsv());
+        }
         String includeList = "," + 
                 nodeListPlant.getText() + "," + 
                 nodeListAnimal.getText() + ",";
@@ -760,6 +763,7 @@ public class FormParamAnalSim extends javax.swing.JFrame {
             //if node's biomass is not w/in specified percentile, exclude
             //unless it's the primary producer or specified as a node to include
             if (nodeIdx != Constants.PP_NODE_ID && !includeList.contains(nodeStr)
+                    && ecosysTimesteps != null
                     && (ecosysTimesteps.avgBiomassPercentile(nodeIdx) * 100.0)
                     < Double.parseDouble(bmPercentile.getText())) {
                 continue;
