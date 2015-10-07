@@ -91,6 +91,8 @@ public final class SimJobManager {
             String descript = job.getJob_Descript();
             descript = descript.substring(0, Math.min(descript.length(),50));
             
+            long simStartTime = System.currentTimeMillis();
+
             SimulationIds simIds = simEngine.createAndRunSeregenttiSubFoodwebForSimJob(nodeListArray, 
                     descript, 0, 0, true);
             manipId = simIds.getManipId();
@@ -114,6 +116,7 @@ public final class SimJobManager {
 
             /*runs manipulation timestep 2+ (executeManipulationRequest)*/
             simEngine.run(++nextTimestep, job.getTimesteps(), manipId, false);
+            double simDuration = (System.currentTimeMillis() - simStartTime) / 1000f;
 
             //save job with biomass information and job ID info
             job.setManipulation_Id(manipId);
@@ -123,7 +126,9 @@ public final class SimJobManager {
                     job.getSpeciesNodeList(), !PathTable.PP_ONLY);
             Log.consoleln("consumeMap " + consumeMap.toString());
             Log.consoleln("pathTable " + pathTable.toString());
-            job.setCsv("Manipulation_id: " + manipId + "\n"
+
+            job.setCsv("Manipulation_id: " + manipId
+                    + " | Simulation duration: " + simDuration + "\n"
                     + "\"node_config: " + job.getNode_Config() + "\"\n"
                     + simEngine.getBiomassCSVString(manipId) + "\n\n" 
                     + consumeMap.toString() + "\n\n"
