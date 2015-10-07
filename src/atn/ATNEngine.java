@@ -208,6 +208,7 @@ public class ATNEngine {
 
        //output data
        //A. print header
+       psATN.printf("node_config, \"" + job.getNode_Config() + "\"\n");
        psATN.printf("timesteps");
        for (int i = 0; i < timesteps; i++) {
            psATN.printf(",%d", i);
