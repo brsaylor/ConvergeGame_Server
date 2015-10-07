@@ -363,6 +363,37 @@ public class ATNEngine {
 
    }
 
+    /**
+     * Fetch all unprocessed SimJobs from the database and process them using
+     * the local ATN model.
+     */
+    public void processUnprocessedJobs() throws SQLException {
+        List<Integer> jobIds = SimJobDAO.getUnprocessedJobIds(true, 0, 0, "");
+        SimJob job;
+
+        for (int jobId : jobIds) {
+
+            job = null;
+            try {
+                job = SimJobDAO.loadJobNoHistory(jobId, false);
+            } catch (SQLException ex) {
+                Logger.getLogger(ATNEngine.class.getName()).
+                    log(Level.SEVERE, null, ex);
+            }
+
+            if (job == null) {
+                continue;
+            }
+
+            try {
+                processSimJob(job);
+            } catch (SimulationException ex) {
+                Logger.getLogger(ATNEngine.class.getName()).
+                    log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
 	public void processSimJobForJobId(Integer jobId){
 	    SimJob job = null;
         System.out.printf("Processing job ID %d\n", jobId);
@@ -534,12 +565,17 @@ public class ATNEngine {
 //           atn.genODETestDataset();
 //       }
 
-       SimJob job = new SimJob();
-       job.setJob_Descript("atn1");
-       job.setNode_Config("2,[5],2000,1.000,0,0,[70],2494,13.000,1,X=0.155,0");	//Info comes from client
-       job.setManip_Timestamp((new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(new Date()));
-       job.setTimesteps(401);
-       atn.processSimJob(job);
+       if (args.length > 0 && args[0].equals("unprocessed")) {
+           System.out.println("Processing unprocessed jobs");
+           atn.processUnprocessedJobs();
+       } else {
+           SimJob job = new SimJob();
+           job.setJob_Descript("atn1");
+           job.setNode_Config("2,[5],2000,1.000,0,0,[70],2494,13.000,1,X=0.155,0");	//Info comes from client
+           job.setManip_Timestamp((new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(new Date()));
+           job.setTimesteps(401);
+           atn.processSimJob(job);
+       }
        System.out.println("Processing complete.");
 
    }
